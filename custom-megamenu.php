@@ -21,8 +21,6 @@ add_action('init', 'custom_mega_menu_register_location');
 function custom_mega_menu_add_fields($item_id, $item, $depth, $args) {
     $enable_mega_menu = get_post_meta($item_id, '_menu_item_mega_menu', true);
     $template_id = get_post_meta($item_id, '_menu_item_template_id', true);
-
-    // $elementor_templates = \Elementor\plugin::$instances-> templates_manager->get_source('local')->get_items();
     $elementor_templates = \Elementor\Plugin::$instance->templates_manager->get_source('local')->get_items();
 
     ?>
@@ -95,7 +93,7 @@ class Custom_Mega_Menu_Walker extends Walker_Nav_Menu {
 
         $output .= '<li class="viva-custom-megamenu menu-item ' . esc_attr($classes) . '">';
 
-        $output .= '<a href="' . esc_url($item->url) . '">' . esc_html($item->title) . '</a>';
+        $output .= '<a href="' . esc_url($item->url) . '">' . $item->title . '</a>';
 
         if ($enable_mega_menu && $template_id) {
             $output .= '<div class="mega-menu-content">';
