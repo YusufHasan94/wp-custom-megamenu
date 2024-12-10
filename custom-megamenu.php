@@ -62,6 +62,8 @@ function custom_mega_menu_add_fields($item_id, $item, $depth, $args) {
     </p>
     <?php
 }
+
+
 add_action('wp_nav_menu_item_custom_fields', 'custom_mega_menu_add_fields', 10, 4);
 
 // Save Custom Fields.
@@ -130,5 +132,86 @@ function custom_mega_menu_display($args) {
     return $args;
 }
 add_filter('wp_nav_menu_args', 'custom_mega_menu_display');
+
+
+// Register Mega Menu Templates Admin Page.
+function custom_mega_menu_admin_page() {
+    add_menu_page(
+        __('Mega Menu Templates', 'textdomain'),
+        __('Mega Menu Templates', 'textdomain'),
+        'manage_options',
+        'mega-menu-templates',
+        'custom_mega_menu_admin_page_callback',
+        'dashicons-menu',
+        60
+    );
+}
+add_action('admin_menu', 'custom_mega_menu_admin_page');
+
+// Admin Page Callback.
+function custom_mega_menu_admin_page_callback() {
+    if (!class_exists('\Elementor\Plugin')) {
+        echo '<div class="notice notice-error"><p>' . __('Elementor plugin is required for this feature.', 'textdomain') . '</p></div>';
+        return;
+    }
+
+    $elementor_templates = \Elementor\Plugin::$instance->templates_manager->get_source('local')->get_items();
+    ?>
+    <div class="wrap">
+        <h1><?php _e('Mega Menu Templates', 'textdomain'); ?></h1>
+
+        <a href="<?php echo admin_url('post-new.php?post_type=elementor_library'); ?>" class="button button-primary" style="margin-bottom: 20px;">
+            <?php _e('Add New Template', 'textdomain'); ?>
+        </a>
+        
+        <table class="wp-list-table widefat striped">
+            <thead>
+                <tr>
+                    <th><?php _e('Template Name', 'textdomain'); ?></th>
+                    <th><?php _e('Template ID', 'textdomain'); ?></th>
+                    <th><?php _e('Actions', 'textdomain'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if (!empty($elementor_templates)) {
+                    foreach ($elementor_templates as $template) {
+                        if (stripos($template['title'], 'mega menu') !== false) {
+                            echo '<tr>';
+                            echo '<td>' . esc_html($template['title']) . '</td>';
+                            echo '<td>' . esc_html($template['template_id']) . '</td>';
+                            echo '<td><a href="' . admin_url('post.php?post=' . $template['template_id'] . '&action=edit') . '" class="button button-primary">' . __('Edit', 'textdomain') . '</a></td>';
+                            echo '</tr>';
+                        }
+                    }
+                } else {
+                    echo '<tr><td colspan="3">' . __('No templates found.', 'textdomain') . '</td></tr>';
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+}
+
+// Fetch All Elementor Templates for Mega Menu Field.
+function custom_mega_menu_fetch_templates() {
+    if (!class_exists('\Elementor\Plugin')) {
+        return [];
+    }
+
+    $elementor_templates = \Elementor\Plugin::$instance->templates_manager->get_source('local')->get_items();
+    $mega_menu_templates = [];
+
+    foreach ($elementor_templates as $template) {
+        if (stripos($template['title'], 'mega menu') !== false) {
+            $mega_menu_templates[] = $template;
+        }
+    }
+
+    return $mega_menu_templates;
+}
+
+
 
 
