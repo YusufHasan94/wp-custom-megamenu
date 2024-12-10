@@ -21,6 +21,10 @@ add_action('init', 'custom_mega_menu_register_location');
 function custom_mega_menu_add_fields($item_id, $item, $depth, $args) {
     $enable_mega_menu = get_post_meta($item_id, '_menu_item_mega_menu', true);
     $template_id = get_post_meta($item_id, '_menu_item_template_id', true);
+
+    // $elementor_templates = \Elementor\plugin::$instances-> templates_manager->get_source('local')->get_items();
+    $elementor_templates = \Elementor\Plugin::$instance->templates_manager->get_source('local')->get_items();
+
     ?>
     <p 
         class="field-custom description description-wide">
@@ -39,12 +43,23 @@ function custom_mega_menu_add_fields($item_id, $item, $depth, $args) {
         <label 
             for="edit-menu-item-template-<?php echo $item_id; ?>">
             <?php _e('Elementor Template ID (for Mega Menu)'); ?><br>
-            <input 
-                type="number" 
+            <select 
                 id="edit-menu-item-template-<?php echo $item_id; ?>" 
-                name="menu-item-template[<?php echo $item_id; ?>]" 
-                value="<?php echo esc_attr($template_id); ?>" 
-                placeholder="Enter Template ID">
+                name="menu-item-template[<?php echo $item_id; ?>]">
+                <option value=""><?php _e('Select a Template'); ?></option>
+                <?php
+                if (!empty($elementor_templates)) {
+                    foreach ($elementor_templates as $template) {
+                        if(stripos($template['title'], 'mega menu') !== false){
+                            $selected = selected($template_id, $template['template_id'], false);
+                            echo '<option value="' . esc_attr($template['template_id']) . '" ' . $selected . '>' . esc_html($template['title']) . '</option>';
+                        }
+                    }
+                } else {
+                    echo '<option value="">' . __('No templates found') . '</option>';
+                }
+                ?>
+            </select>
         </label>
     </p>
     <?php
@@ -78,7 +93,7 @@ class Custom_Mega_Menu_Walker extends Walker_Nav_Menu {
             $classes .= ' has-mega-menu';
         }
 
-        $output .= '<li class="menu-item ' . esc_attr($classes) . '">';
+        $output .= '<li class="viva-custom-megamenu menu-item ' . esc_attr($classes) . '">';
 
         $output .= '<a href="' . esc_url($item->url) . '">' . esc_html($item->title) . '</a>';
 
@@ -110,32 +125,6 @@ class Custom_Mega_Menu_Walker extends Walker_Nav_Menu {
     }
 }
 
-
-// Enqueue Inline Styles for Mega Menu.
-function custom_mega_menu_inline_styles() {
-    ?>
-    <style>
-        .menu-item {
-            position: relative;
-        }
-        .menu-item .mega-menu-content {
-            width: 800px!important;
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background-color: #fff;
-            z-index: 999;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 20px;
-        }
-        .menu-item:hover > .mega-menu-content {
-            display: block;
-        }
-    </style>
-    <?php
-}
-add_action('wp_head', 'custom_mega_menu_inline_styles');
 
 // Render Mega Menu with Custom Walker.
 function custom_mega_menu_display($args) {
