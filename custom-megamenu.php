@@ -3,7 +3,7 @@
  * Plugin Name: Custom Mega Menu
  * Description: A plugin to create and manage custom mega menus for WordPress using Elementor.
  * Version: 1.1.0
- * Author: Your Name
+ * Author: Yusuf Hasan
  */
 
 // Exit if accessed directly.
@@ -22,16 +22,29 @@ function custom_mega_menu_add_fields($item_id, $item, $depth, $args) {
     $enable_mega_menu = get_post_meta($item_id, '_menu_item_mega_menu', true);
     $template_id = get_post_meta($item_id, '_menu_item_template_id', true);
     ?>
-    <p class="field-custom description description-wide">
-        <label for="edit-menu-item-mega-menu-<?php echo $item_id; ?>">
-            <input type="checkbox" id="edit-menu-item-mega-menu-<?php echo $item_id; ?>" name="menu-item-mega-menu[<?php echo $item_id; ?>]" value="1" <?php checked($enable_mega_menu, 1); ?>>
+    <p 
+        class="field-custom description description-wide">
+        <label 
+            for="edit-menu-item-mega-menu-<?php echo $item_id; ?>">
+            <input 
+                type="checkbox" 
+                id="edit-menu-item-mega-menu-<?php echo $item_id; ?>" 
+                name="menu-item-mega-menu[<?php echo $item_id; ?>]" 
+                value="1" <?php checked($enable_mega_menu, 1); ?>>
             <?php _e('Enable Mega Menu'); ?>
         </label>
     </p>
-    <p class="field-custom description description-wide">
-        <label for="edit-menu-item-template-<?php echo $item_id; ?>">
+    <p 
+        class="field-custom description description-wide">
+        <label 
+            for="edit-menu-item-template-<?php echo $item_id; ?>">
             <?php _e('Elementor Template ID (for Mega Menu)'); ?><br>
-            <input type="number" id="edit-menu-item-template-<?php echo $item_id; ?>" name="menu-item-template[<?php echo $item_id; ?>]" value="<?php echo esc_attr($template_id); ?>" placeholder="Enter Template ID">
+            <input 
+                type="number" 
+                id="edit-menu-item-template-<?php echo $item_id; ?>" 
+                name="menu-item-template[<?php echo $item_id; ?>]" 
+                value="<?php echo esc_attr($template_id); ?>" 
+                placeholder="Enter Template ID">
         </label>
     </p>
     <?php
