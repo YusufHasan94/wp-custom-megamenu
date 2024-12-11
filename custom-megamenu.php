@@ -88,14 +88,16 @@ class Custom_Mega_Menu_Walker extends Walker_Nav_Menu {
         $enable_mega_menu = get_post_meta($item->ID, '_menu_item_mega_menu', true);
         $template_id = get_post_meta($item->ID, '_menu_item_template_id', true);
 
+    
         $classes = implode(' ', $item->classes);
+
         if ($enable_mega_menu) {
             $classes .= ' has-mega-menu';
         }
 
-        $output .= '<li class="viva-custom-megamenu menu-item ' . esc_attr($classes) . '">';
+        $output .= '<li class="menu-item ' . esc_attr($classes) . '">';
 
-        $output .= '<a href="' . esc_url($item->url) . '">' . $item->title . '</a>';
+        $output .= '<a class="elementor-item elementor-item-anchor" href="' . esc_url($item->url) . '">' . $item->title . '</a>';
 
         if ($enable_mega_menu && $template_id) {
             $output .= '<div class="mega-menu-content">';
@@ -168,6 +170,8 @@ function custom_mega_menu_admin_page_callback() {
             <thead>
                 <tr>
                     <th><?php _e('Template Name', 'textdomain'); ?></th>
+                    <th><?php _e('Type', 'textdomain'); ?></th>
+                    <th><?php _e('Author', 'textdomain'); ?></th>
                     <th><?php _e('Template ID', 'textdomain'); ?></th>
                     <th><?php _e('Actions', 'textdomain'); ?></th>
                 </tr>
@@ -179,6 +183,8 @@ function custom_mega_menu_admin_page_callback() {
                         if (stripos($template['title'], 'mega menu') !== false) {
                             echo '<tr>';
                             echo '<td>' . esc_html($template['title']) . '</td>';
+                            echo '<td>' . esc_html($template['type']) . '</td>';
+                            echo '<td>' . esc_html($template['author']) . '</td>';
                             echo '<td>' . esc_html($template['template_id']) . '</td>';
                             echo '<td><a href="' . admin_url('post.php?post=' . $template['template_id'] . '&action=edit') . '" class="button button-primary">' . __('Edit', 'textdomain') . '</a></td>';
                             echo '</tr>';
