@@ -85,20 +85,46 @@ add_action('wp_update_nav_menu_item', 'custom_mega_menu_save_fields', 10, 2);
 // Walker Class for Mega Menu.
 class Custom_Mega_Menu_Walker extends Walker_Nav_Menu {
     public function start_el(&$output, $item, $depth = 0, $args = null, $id = 0) {
+        $classes = empty($item->classes)?[]:(array)$item->classes;
+        $classes[] = 'menu-item-'.$item->ID;
         $enable_mega_menu = get_post_meta($item->ID, '_menu_item_mega_menu', true);
-        $template_id = get_post_meta($item->ID, '_menu_item_template_id', true);
-
-    
-        $classes = implode(' ', $item->classes);
-
-        if ($enable_mega_menu) {
-            $classes .= ' has-mega-menu';
+        if($enable_mega_menu){
+            $classes[] = 'has-mega-menu';
         }
 
-        $output .= '<li class="menu-item ' . esc_attr($classes) . '">';
+        $class_names = join(' ', apply_filters('nav_menu_css_class', array_filter($classes), $item, $args, $depth));
+        $class_names = $class_names ? 'class="'.esc_attr($class_names).'"': '';
 
-        $output .= '<a class="elementor-item elementor-item-anchor" href="' . esc_url($item->url) . '">' . $item->title . '</a>';
+        $id = apply_filters('nav_menu_item_id', 'menu-item-'. $item->ID, $item, $args, $depth);
+        $id = $id ? 'id="'.esc_attr($id).'"':'';
 
+        $output .= '<li ' . $id . $class_names . '>';
+        
+        $atts = [
+            'title'         => !empty($item->attr_title)?$item->attr_title:'',
+            'target'        => !empty($item->target)?$item->target:'',
+            'rel'           => !empty($item->xfn) ? $item->xfn : '',
+            'href'          => !empty($item->url)?$item->url:'',
+            'aria-current'  => $item->current? 'page':''
+        ];
+
+        $atts = apply_filters('nav_menu_link_attributes', $atts, $item, $args, $depth);
+        $attributes = '';
+        foreach ($atts as $attr => $value) {
+            if (!empty($value)) {
+                $attributes .= ' ' . esc_attr($attr) . '="' . esc_attr($value) . '"';
+            }
+        }
+        
+        $item_output = $args->before;
+        $item_output .= '<a' . $attributes . '>';
+        $item_output .= $args->link_before . apply_filters('the_title', $item->title, $item->ID) . $args->link_after;
+        $item_output .= '</a>';
+        $item_output .= $args->after;
+
+        $output .= apply_filters('walker_nav_menu_start_el', $item_output, $item, $depth, $args);
+
+        $template_id = get_post_meta($item->ID, '_menu_item_template_id', true);
         if ($enable_mega_menu && $template_id) {
             $output .= '<div class="mega-menu-content">';
             $output .= $this->render_elementor_template($template_id);
